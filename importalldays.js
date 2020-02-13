@@ -1,5 +1,6 @@
 const puppeteer = require("puppeteer")
 const mysql = require('./config');
+const func = require('./func');
 
 const getData = async () => {
   const browser = await puppeteer.launch({ headless: true })
@@ -22,7 +23,7 @@ const getData = async () => {
        {
         number = number + '+' + temp;
        }else{
-        number = number + ',' + temp;
+        number = number + '-' + temp;
        }
 
        i++;
@@ -32,7 +33,16 @@ const getData = async () => {
       })
 
   browser.close();
-  console.log(result)
+  let sqlRequest = `SELECT count(*) as nb FROM number WHERE number = '${result.number}'`;
+  mysql.conn.query(sqlRequest, function(err, rows, fields) {
+    if (rows[0].nb == 0)
+    {
+      let sqlRequest = `INSERT INTO number(date,number) VALUES('${func.timestamp + '000'}','${result.number}')`;
+      mysql.conn.query(sqlRequest);
+      mysql.conn.end();
+    }
+  });
+ // 
 }
 
 getData();
