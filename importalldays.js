@@ -1,6 +1,6 @@
-// Import de puppeteer
 const puppeteer = require("puppeteer")
-const sql = require('./config.js');
+const mysql = require('./config');
+
 const getData = async () => {
   const browser = await puppeteer.launch({ headless: true })
   const page = await browser.newPage()
@@ -9,12 +9,22 @@ const getData = async () => {
   await page.waitFor(1000)
     const result = await page.evaluate(() => {
 
-        let number = [];
+        let number = "";
         let i = 0;
         let temp = 0;
         while (i < 6){
        temp = document.getElementsByClassName('numbers-item_num')[i].innerText
-       number.push(`'${temp}'`);
+
+       if (i == 0)
+       {
+        number = temp;
+       }else if (i == 5)
+       {
+        number = number + '+' + temp;
+       }else{
+        number = number + ',' + temp;
+       }
+
        i++;
        }
        
@@ -22,10 +32,7 @@ const getData = async () => {
       })
 
   browser.close();
-  return result
+  console.log(result)
 }
 
-// Appel de la fonction getData() et affichage des données
-getData().then(value => {
-  console.log(value)
-})
+getData();
