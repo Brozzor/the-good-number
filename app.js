@@ -1,25 +1,29 @@
 // Import de puppeteer
 const puppeteer = require("puppeteer")
-
+const sql = require('./config.js');
 const getData = async () => {
-  // 1 - Créer une instance de navigateur
-  const browser = await puppeteer.launch({ headless: false })
+  const browser = await puppeteer.launch({ headless: true })
   const page = await browser.newPage()
 
-  // 2 - Naviguer jusqu'à l'URL cible
   await page.goto("https://www.fdj.fr/jeux-de-tirage/loto/resultats")
-  await page.waitFor(7000) // fait une pause d'une seconde
+  await page.waitFor(1000)
     const result = await page.evaluate(() => {
 
-        number = document.getElementsByClassName('numbers-item_num')[0].innerText
+        let number = [];
+        let i = 0;
+        let temp = 0;
+        while (i < 6){
+       temp = document.getElementsByClassName('numbers-item_num')[i].innerText
+       number.push(`'${temp}'`);
+       i++;
+       }
+       
         return { number }
       })
-  console.log();
 
-  browser.close()
+  browser.close();
   return result
 }
-
 
 // Appel de la fonction getData() et affichage des données
 getData().then(value => {
